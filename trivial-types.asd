@@ -36,7 +36,7 @@ write a function that takes a package-oid argument like:
       (loop for symbol being the external-symbol of package
             collect symbol))"
   :version "0.1"
-  :author "Tomohiro Matsuyama"
+  :author "Original author: Tomohiro Matsuyama"
   :license "LLGPL"
   :components ((:module "src"
                 :serial t
@@ -46,4 +46,5 @@ write a function that takes a package-oid argument like:
                              (:file "designators")
                              (:file "streams")
                              (:file "combinators")
+                             (:file "names")
                              (:file "typespecs")))))

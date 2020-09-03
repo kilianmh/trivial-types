@@ -23,6 +23,8 @@
            #:file-associated-stream-p
            #:file-associated-stream
 
+           #:function-name
+
            #:non-nil
 
            #:type-specifier-p
