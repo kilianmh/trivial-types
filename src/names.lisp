@@ -7,5 +7,6 @@
        (symbolp (cadr object))))
 
 (deftype function-name ()
+  ;; Doesn't work great with subtypep
   "Ref: http://www.lispworks.com/documentation/HyperSpec/Body/26_glo_f.htm#function_name"
   `(or symbol (satisfies setf-function-name-p)))

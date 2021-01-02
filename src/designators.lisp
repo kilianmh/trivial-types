@@ -1,8 +1,16 @@
 (in-package :trivial-types)
 
+(defun character-designator-p (object)
+  (and (typep object 'string-designator)
+       (= 1 (length (string object)))))
+
 (deftype character-designator ()
-  '(or (string 1)
-       character))
+  `(or (string 1)
+       character
+       ;; Can also be a symbol of length 1
+       ;; http://clhs.lisp.se/Body/26_glo_c.htm#character_designator
+       ;; However, this does not work well with subtypep
+       (satisfies character-designator-p)))
 
 (deftype function-designator ()
   '(or symbol
