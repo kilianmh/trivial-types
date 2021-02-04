@@ -1,7 +1,7 @@
 on:
-  push
+  push:
   pull_request:
-    branches: [ master ]:
+    branches: [ master dev ]
 
 jobs:
 
@@ -11,7 +11,7 @@ jobs:
 
     strategy:
       matrix:
-        lisp: [sbcl, ccl, ecl]
+        lisp: [sbcl, ccl]
     runs-on: ubuntu-latest
 
     steps:
@@ -25,14 +25,18 @@ jobs:
     - name: Check $PATH
       run: echo $PATH
 
+# February 2020:
+# cl-travis issue - tput: No value for $TERM and no -T specified
+# roswell issue - libcurl3 versions
+
     - name: Download implementation
       env:
         LISP: ${{ matrix.lisp }}
       run: |
         pwd
         ls -l
-        bash <(curl -s https://raw.githubusercontent.com/luismbo/cl-travis/master/run.sh)
+        bash <(curl -s https://raw.githubusercontent.com/digikar99/lisp-travis-lite/master/run.sh)
 
     - name: Compile and Run Tests
       run: |
-        cl -e '(asdf:test-system "trivial-types")'
+        cl --eval '(progn (push #P"./" ql:*local-project-directories*) (ql:quickload "trivial-types"))' --eval '(asdf:test-system "trivial-types")'
