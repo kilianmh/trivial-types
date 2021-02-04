@@ -30,3 +30,5 @@
            #:type-specifier-p
            #:type-specifier
            #:type-expand))
+
+(5am:def-suite :trivial-types)

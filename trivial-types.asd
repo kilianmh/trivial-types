@@ -38,6 +38,7 @@ write a function that takes a package-oid argument like:
   :version "0.1"
   :author "Original author: Tomohiro Matsuyama"
   :license "LLGPL"
+  :depends-on ("fiveam")
   :components ((:module "src"
                 :serial t
                 :components ((:file "package")
@@ -47,4 +48,9 @@ write a function that takes a package-oid argument like:
                              (:file "streams")
                              (:file "combinators")
                              (:file "names")
-                             (:file "typespecs")))))
+                             (:file "typespecs"))))
+  :perform (test-op (o c)
+             (declare (ignore o c))
+             (eval (read-from-string "(LET ((5AM:*ON-ERROR* :DEBUG)
+                                            (5AM:*ON-FAILURE* :DEBUG))
+                                       (5AM:RUN :TRIVIAL-TYPES))"))))
