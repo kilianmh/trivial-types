@@ -1,3 +1,6 @@
+> Experienced lispers are welcome to take over the maintenance of this library. In
+> the meantime, I'll try my best to maintain, I myself do need this library.
+
 trivial-types - Trivial type definitions
 ========================================
 
