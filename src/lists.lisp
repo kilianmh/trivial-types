@@ -48,7 +48,7 @@ Examples:
        (and list (satisfies proper-list-p)
             ,(if (eq element-type '*)
                  t
-                 (let* ((predicate-name   (symbol-name element-type))
+                 (let* ((predicate-name   (format nil "LIST OF ~S" element-type))
                         (predicate-symbol (intern predicate-name :trivial-types/proper-list))
                         (list             (gensym))
                         (elt              (gensym)))
@@ -59,6 +59,9 @@ Examples:
 
 (5am:def-test proper-list ()
   (5am:is-true  (typep '(1 2 3) 'proper-list))
+  #+(or sbcl ccl)
+  (5am:is-true  (typep (list (make-array 1 :element-type 'single-float :initial-element 0.0f0))
+                       '(proper-list (array single-float))))
   (5am:is-true  (typep '(1 2 3) '(proper-list integer)))
   (5am:is-false (typep '(1 2 3) '(proper-list string)))
   (5am:is-false (typep '(1 . 2) 'proper-list))
