@@ -23,3 +23,18 @@
         #+clisp (return (ext:type-expand type-specifier)))
       (prog1 type-specifier
         (warn "TYPE-EXPAND not available for this implementation"))))
+
+(defun type= (type1 type2)
+  "Returns a primary value of T is TYPE1 and TYPE2 are the same type,
+and a secondary value that is true is the type equality could be reliably
+determined: primary value of NIL and secondary value of T indicates that the
+types are not equivalent."
+  (multiple-value-bind (sub ok) (subtypep type1 type2)
+    (cond ((and ok sub)
+           (subtypep type2 type1))
+          (ok
+           (values nil ok))
+          (t
+           (multiple-value-bind (sub ok) (subtypep type2 type1)
+             (declare (ignore sub))
+             (values nil ok))))))

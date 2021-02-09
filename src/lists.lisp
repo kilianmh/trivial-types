@@ -32,6 +32,8 @@ Examples:
 
 (defpackage trivial-types/proper-list (:use))
 
+(defvar *proper-list-element-type-alist* nil)
+
 (deftype proper-list (&optional (element-type '*))
   "Equivalent to `(or null (and list (satisfies proper-list-p)))`.
 
@@ -52,20 +54,30 @@ Examples:
                         (predicate-symbol (intern predicate-name :trivial-types/proper-list))
                         (list             (gensym))
                         (elt              (gensym)))
-                   (compile predicate-symbol
-                            `(lambda (,list)
-                               (loop :for ,elt :in ,list :always (typep ,elt ',element-type))))
-                   `(satisfies ,predicate-symbol))))))
+                   `(satisfies
+                     ,(if (assoc element-type *proper-list-element-type-alist*
+                                 :test #'type=)
+                          (cdr (assoc element-type *proper-list-element-type-alist*
+                                      :test #'type=))
+                          (progn
+                            (compile predicate-symbol
+                                     `(lambda (,list)
+                                        (loop :for ,elt :in ,list
+                                              :always (typep ,elt ',element-type))))
+                            (push (cons element-type predicate-symbol)
+                                  *proper-list-element-type-alist*)
+                            predicate-symbol))))))))
 
 (5am:def-test proper-list ()
   (5am:is-true  (typep '(1 2 3) 'proper-list))
-  #+(or sbcl ccl)
   (5am:is-true  (typep (list (make-array 1 :element-type 'single-float :initial-element 0.0f0))
                        '(proper-list (array single-float))))
   (5am:is-true  (typep '(1 2 3) '(proper-list integer)))
   (5am:is-false (typep '(1 2 3) '(proper-list string)))
   (5am:is-false (typep '(1 . 2) 'proper-list))
-  (5am:is-true  (subtypep 'null 'proper-list)))
+  (5am:is-true  (subtypep 'null 'proper-list))
+  (5am:is-true  (type= '(proper-list vector)
+                       '(proper-list (array * 1)))))
 
 (defun property-list-p (object)
   "Returns true if OBJECT is a property list.
