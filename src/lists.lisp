@@ -1,4 +1,5 @@
 (in-package :trivial-types)
+(5am:in-suite :trivial-types)
 
 (declaim (inline proper-list-p
                  property-list-p
@@ -6,6 +7,8 @@
                  tuplep))
 
 (defmacro %proper-list-p (var &optional (element-type '*))
+  ;; ELEMENT-TYPE is not used by PROPER-LIST-P; however, it is used by some
+  ;; other constructs in this file
   `(loop
      (typecase ,var
        (null (return t))
@@ -27,16 +30,54 @@ Examples:
   (declare (optimize . #.*standard-optimize-qualities*))
   (%proper-list-p object))
 
+(defpackage trivial-types/proper-list (:use))
+
+(defvar *proper-list-element-type-alist* nil)
+
 (deftype proper-list (&optional (element-type '*))
-  "Equivalent to `(and list (satisfies proper-list-p))`. ELEMENT-TYPE
-is just ignored.
+  "Equivalent to `(or null (and list (satisfies proper-list-p)))`.
 
 Examples:
 
     (typep '(1 2 3) '(proper-list integer)) => T
-    (typep '(1 2 3) '(proper-list string)) => T"
-  (declare (ignore element-type))
-  '(and list (satisfies proper-list-p)))
+    (typep '(1 2 3) '(proper-list string)) => NIL"
+  ;; http://www.lispworks.com/documentation/HyperSpec/Body/04_bc.htm
+  (setq element-type
+        (etypecase element-type
+          ((or standard-class structure-class) (class-name element-type))
+          ((or symbol list)                    element-type)))
+  `(or null
+       (and list (satisfies proper-list-p)
+            ,(if (eq element-type '*)
+                 t
+                 (let* ((predicate-name   (format nil "LIST OF ~S" element-type))
+                        (predicate-symbol (intern predicate-name :trivial-types/proper-list))
+                        (list             (gensym))
+                        (elt              (gensym)))
+                   `(satisfies
+                     ,(if (assoc element-type *proper-list-element-type-alist*
+                                 :test #'type=)
+                          (cdr (assoc element-type *proper-list-element-type-alist*
+                                      :test #'type=))
+                          (progn
+                            (compile predicate-symbol
+                                     `(lambda (,list)
+                                        (loop :for ,elt :in ,list
+                                              :always (typep ,elt ',element-type))))
+                            (push (cons element-type predicate-symbol)
+                                  *proper-list-element-type-alist*)
+                            predicate-symbol))))))))
+
+(5am:def-test proper-list ()
+  (5am:is-true  (typep '(1 2 3) 'proper-list))
+  (5am:is-true  (typep (list (make-array 1 :element-type 'single-float :initial-element 0.0f0))
+                       '(proper-list (array single-float))))
+  (5am:is-true  (typep '(1 2 3) '(proper-list integer)))
+  (5am:is-false (typep '(1 2 3) '(proper-list string)))
+  (5am:is-false (typep '(1 . 2) 'proper-list))
+  (5am:is-true  (subtypep 'null 'proper-list))
+  (5am:is-true  (type= '(proper-list vector)
+                       '(proper-list (array * 1)))))
 
 (defun property-list-p (object)
   "Returns true if OBJECT is a property list.
@@ -54,7 +95,7 @@ Examples:
     (null t)
     (cons
      (loop
-       (if (null object) 
+       (if (null object)
            (return t)
            (let ((key (car object))
                  (next (cdr object)))
