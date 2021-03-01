@@ -40,7 +40,17 @@ Examples:
 Examples:
 
     (typep '(1 2 3) '(proper-list integer)) => T
-    (typep '(1 2 3) '(proper-list string)) => NIL"
+    (typep '(1 2 3) '(proper-list string)) => NIL
+
+If ELEMENT-TYPE is supplied, please add the following form to your system:
+
+    (eval-when (:compile-toplevel :load-toplevel :execute)
+      (trivial-types:type-expand (trivial-types:proper-list your-element-type)))
+
+This is especially required for type-declarations because once type-expansion
+has taken place during compile time, the helper-functions that were defined
+during compile-time are no longer available during load or execution time
+with a fresh image."
   ;; http://www.lispworks.com/documentation/HyperSpec/Body/04_bc.htm
   (setq element-type
         (etypecase element-type
