@@ -2,7 +2,7 @@
 
 (defun type-specifier-p (type-specifier)
   "Returns true if TYPE-SPECIFIER is a valid type specfiier."
-  (or (unless (consp type-specifier)
+  (or (when (symbolp type-specifier)
         (documentation type-specifier 'type))
       (block nil
         #+sbcl (return (sb-ext:valid-type-specifier-p type-specifier))
