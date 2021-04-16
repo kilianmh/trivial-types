@@ -18,8 +18,9 @@
                  (return)))
        (t    (return)))))
 
-(defun proper-list-p (object)
-  "Returns true if OBJECT is a proper list.
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (defun proper-list-p (object)
+    "Returns true if OBJECT is a proper list.
 
 Examples:
 
@@ -27,12 +28,11 @@ Examples:
     (proper-list-p '(1 . 2)) => NIL
     (proper-list-p nil) => T
     (proper-list-p '(1 2 3)) => T"
-  (declare (optimize . #.*standard-optimize-qualities*))
-  (%proper-list-p object))
+    (declare (optimize . #.*standard-optimize-qualities*))
+    (%proper-list-p object))
+  (defvar *proper-list-element-type-alist* nil))
 
 (defpackage trivial-types/proper-list (:use))
-
-(defvar *proper-list-element-type-alist* nil)
 
 (deftype proper-list (&optional (element-type '*))
   "Equivalent to `(or null (and list (satisfies proper-list-p)))`.
