@@ -10,7 +10,7 @@
        ;; Can also be a symbol of length 1
        ;; http://clhs.lisp.se/Body/26_glo_c.htm#character_designator
        ;; However, this does not work well with subtypep
-       (satisfies character-designator-p)))
+       (and symbol (satisfies character-designator-p))))
 
 (deftype function-designator ()
   '(or symbol
