@@ -1,5 +1,6 @@
-> Experienced lispers are welcome to take over the maintenance of this library. In
-> the meantime, I'll try my best to maintain, I myself do need this library.
+> Experienced lispers are welcome to take over the maintenance of this library.
+> ~~In the meantime, I'll try my best to maintain, I myself do need this library.~~
+> I no longer use or maintain this library and have moved over to [peltadot](https://gitlab.com/digikar/peltadot/) - the problems of lisp's types are far too complex to be solved trivially.
 
 trivial-types - Trivial type definitions
 ========================================
